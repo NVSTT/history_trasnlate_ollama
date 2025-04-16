@@ -1,0 +1,179 @@
+/* 🌟 Основные переменные */
+:root {
+    --primary-color: #4B382A; /* Тёплый коричневый (заголовки, кнопки) */
+    --secondary-color: #BFA276; /* Бледное золото для ховера кнопок */
+    --bg-color: #F9F8F6;       /* Цвет фона, близкий к пергаменту */
+    --card-bg: #F3EFEA;        /* Фон карточек, чуть светлее */
+    --border-color: #D1C6B8;   /* Светлый серо-бежевый цвет для рамок */
+    --text-color: #3A2D1F;     /* Тёмно-коричневый цвет текста */
+}
+
+/*
+   Если вы хотите поддерживать автоматическую тёмную тему,
+   поменяйте media на (prefers-color-scheme: dark) вместо (prefers-color-scheme: light).
+   Ниже пример тёмной темы (очень условно).
+*/
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-color: #1E1E1E;
+        --card-bg: #2C2C2C;
+        --border-color: #555;
+        --text-color: #F5F5F5;
+        --primary-color: #BFA276;
+        --secondary-color: #4B382A;
+    }
+}
+
+/* 🌟 Общий стиль */
+body {
+    font-family: 'Old Standard TT', serif; /* Меняем на старинный стиль */
+    padding: 15px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+}
+
+/* 🌟 Контейнер */
+.container {
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+/* 🌟 Карточки */
+.card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 🌟 Заголовки */
+h2, h3, h4 {
+    font-family: 'Uncial Antiqua', serif; /* Традиционный старинный шрифт */
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+/* 🌟 Кнопки */
+button {
+    background: var(--primary-color);
+    color: #FFF;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 5px 0;
+    font-family: 'Old Standard TT', serif;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    display: block;
+    width: 100%;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+
+button:hover {
+    background: var(--secondary-color);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+/* 🌟 Поля ввода */
+textarea,
+.search-input {
+    width: 100%;
+    min-height: 120px;
+    margin: 10px 0;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: #FFF; /* Белый фон, чтобы текст был контрастнее */
+    font-family: 'Old Standard TT', serif;
+    font-size: 1.1em;
+    color: var(--text-color);
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.search-input {
+    min-height: auto;
+    padding: 10px;
+}
+
+/* 🌟 Карточки документов */
+.text-card {
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    background: var(--card-bg);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.text-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 🌟 Загрузчик */
+.loader {
+    border: 3px solid var(--border-color);
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 🌟 Декоративный элемент (если нужно) */
+.ornament {
+    text-align: center;
+    color: var(--secondary-color);
+    font-size: 1.5em;
+    margin: 10px 0;
+    opacity: 0.6;
+}
+
+.ornament::before,
+.ornament::after {
+    content: '❖';
+    margin: 0 10px;
+}
+
+/* 🌟 Скроллбар (для WebKit) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 4px;
+}
+
+/* 🌟 Фокус на поле ввода */
+textarea:focus,
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(75, 56, 42, 0.2);
+}
