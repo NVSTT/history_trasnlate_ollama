@@ -54,20 +54,41 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// Функция проверки дореформенного текста
+// Улучшенная функция проверки дореформенного текста с отладкой
 function isPreReformRussianText(text) {
     // 1. Проверка на наличие характерных букв дореформенного алфавита
     const preReformCharacters = ['ѣ', 'і', 'ѳ', 'ѵ', 'ъ', 'ѕ', 'ѡ', 'ѯ', 'ѱ', 'ѧ', 'ѫ'];
     const hasPreReformCharacters = preReformCharacters.some(char => text.includes(char));
     
     // 2. Проверка на наличие слов с окончаниями на ъ
-    const hasTrailingHardSign = /\w+ъ\b/.test(text);
+    // Улучшенное регулярное выражение для поиска слов с ъ на конце
+    const hasTrailingHardSign = /\S+ъ\b/.test(text);
     
     // 3. Проверка на наличие вопросительных конструкций
-    const hasQuestionStructure = /\?|как|почему|зачем|что такое|расскажи|объясни|кто/i.test(text);
+    // Более точная проверка, исключающая ложные срабатывания
+    const questionPatterns = [
+        /\?/, // вопросительный знак
+        /\bкак\s+/, // "как" с пробелом после
+        /\bпочему\s+/, // "почему" с пробелом после
+        /\bзачем\s+/, // "зачем" с пробелом после
+        /\bчто\s+такое\b/, // "что такое" как фраза
+        /\bрасскажи\s+/, // "расскажи" с пробелом после
+        /\bобъясни\s+/, // "объясни" с пробелом после
+        /\bкто\s+/ // "кто" с пробелом после
+    ];
+    
+    // Проверяем текст на наличие вопросительных конструкций
+    const hasQuestionStructure = questionPatterns.some(pattern => pattern.test(text));
     
     // 4. Проверка длины текста (вопросы обычно короче)
     const isLongEnough = text.length > 50;
+    
+    // Добавляем отладочную информацию (можно удалить в продакшн версии)
+    console.log('Validation debug:');
+    console.log('- Has pre-reform characters:', hasPreReformCharacters);
+    console.log('- Has trailing hard sign:', hasTrailingHardSign);
+    console.log('- Has question structure:', hasQuestionStructure);
+    console.log('- Is long enough:', isLongEnough);
     
     // Текст считается дореформенным, если:
     // - есть характерные буквы ИЛИ окончания на ъ
@@ -78,27 +99,34 @@ function isPreReformRussianText(text) {
 
 // 🚀 Экран ввода нового текста
 function showNewTextForm() {
-    document.getElementById('content').innerHTML = 
+    document.getElementById('content').innerHTML =` 
         <div class="card">
             <h3>Новый текст</h3>
             <textarea id="original-text" placeholder="Введите старорусский текст"></textarea>
             <button onclick="processText()">Обработать</button>
             <button onclick="navigateTo('menu')">Назад</button>
-        </div>;
+        </div>`;
 }
 
-// Обновленная функция отправки текста
+// Обновленная функция отправки текста с дополнительной отладкой
 async function processText() {
     const text = document.getElementById('original-text').value;
-    if (!text) return tg.showAlert('Введите текст');
+    if (!text) {
+        showAlert('Введите текст');
+        return;
+    }
     
     // Проверка текста перед отправкой
-    if (!isPreReformRussianText(text)) {
-        return tg.showAlert('Пожалуйста, введите текст на дореформенном русском языке. ' +
-                           'Текст должен содержать характерные буквы старой орфографии ' +
-                           'и не должен быть сформулирован как вопрос.');
+    const isValid = isPreReformRussianText(text);
+    console.log('Text validation result:', isValid);
+    
+    if (!isValid) {
+        showAlert('Пожалуйста, введите текст на дореформенном русском языке. ' +
+                 'Текст должен содержать характерные буквы старой орфографии ' +
+                 'и не должен быть сформулирован как вопрос.');
+        return;
     }
-
+    
     showLoader();
     try {
         const response = await apiRequest('/api/translate/', 'POST', { text });
@@ -112,9 +140,61 @@ async function processText() {
                 <button onclick="navigateTo('menu')">В главное меню</button>
             </div>`;
     } catch (error) {
-        tg.showAlert('Ошибка обработки: ' + error.message);
+        showAlert('Ошибка обработки: ' + (error.message || 'Неизвестная ошибка'));
     }
 }
+
+// Helper function for showing alerts - completely custom implementation
+function showAlert(message) {
+    // Create custom alert element
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'custom-alert';
+    alertDiv.innerHTML = `
+        <div class="alert-content">
+            <p>${message}</p>
+            <button onclick="this.parentElement.parentElement.remove()">OK</button>
+        </div>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    // Add CSS if not already present
+    if (!document.getElementById('alert-styles')) {
+        const style = document.createElement('style');
+        style.id = 'alert-styles';
+        style.innerHTML = `
+            .custom-alert {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            }
+            .alert-content {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                max-width: 80%;
+                text-align: center;
+            }
+            .alert-content button {
+                margin-top: 15px;
+                padding: 8px 16px;
+                background: #5288c1;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
 // 🚀 Экран поиска
 function showSearch() {
     document.getElementById('content').innerHTML = `
