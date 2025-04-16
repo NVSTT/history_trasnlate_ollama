@@ -54,21 +54,39 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// 🚀 Экран ввода нового текста
-function showNewTextForm() {
-    document.getElementById('content').innerHTML = `
-        <div class="card">
-            <h3>Новый текст</h3>
-            <textarea id="original-text" placeholder="Введите старорусский текст"></textarea>
-            <button onclick="processText()">Обработать</button>
-            <button onclick="navigateTo('menu')">Назад</button>
-        </div>`;
+// Функция проверки дореформенного текста
+function isPreReformRussianText(text) {
+    // 1. Проверка на наличие характерных букв дореформенного алфавита
+    const preReformCharacters = ['ѣ', 'і', 'ѳ', 'ѵ', 'ъ', 'ѕ', 'ѡ', 'ѯ', 'ѱ', 'ѧ', 'ѫ'];
+    const hasPreReformCharacters = preReformCharacters.some(char => text.includes(char));
+    
+    // 2. Проверка на наличие слов с окончаниями на ъ
+    const hasTrailingHardSign = /\w+ъ\b/.test(text);
+    
+    // 3. Проверка на наличие вопросительных конструкций
+    const hasQuestionStructure = /\?|как|почему|зачем|что такое|расскажи|объясни/i.test(text);
+    
+    // 4. Проверка длины текста (вопросы обычно короче)
+    const isLongEnough = text.length > 50;
+    
+    // Текст считается дореформенным, если:
+    // - есть характерные буквы ИЛИ окончания на ъ
+    // - НЕТ вопросительных конструкций
+    // - достаточная длина
+    return (hasPreReformCharacters || hasTrailingHardSign) && !hasQuestionStructure && isLongEnough;
 }
 
-// 🚀 Отправка текста в API для перевода
+// Обновленная функция отправки текста
 async function processText() {
     const text = document.getElementById('original-text').value;
     if (!text) return tg.showAlert('Введите текст');
+    
+    // Проверка текста перед отправкой
+    if (!isPreReformRussianText(text)) {
+        return tg.showAlert('Пожалуйста, введите текст на дореформенном русском языке. ' +
+                           'Текст должен содержать характерные буквы старой орфографии ' +
+                           'и не должен быть сформулирован как вопрос.');
+    }
 
     showLoader();
     try {
@@ -86,7 +104,6 @@ async function processText() {
         tg.showAlert('Ошибка обработки: ' + error.message);
     }
 }
-
 // 🚀 Экран поиска
 function showSearch() {
     document.getElementById('content').innerHTML = `

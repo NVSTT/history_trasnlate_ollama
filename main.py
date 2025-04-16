@@ -23,7 +23,6 @@ BOT_JSON_FILE = BOT_CONFIG_PATH / "bot_config.json"
 
 app = FastAPI(title="Old Russian Texts API", redirect_slashes=False)
 
-# ✅ Подключение статических файлов (Используем правильные пути)
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 app.mount("/templates", StaticFiles(directory=str(TEMPLATE_DIR)), name="templates")
 
