@@ -64,7 +64,7 @@ function isPreReformRussianText(text) {
     const hasTrailingHardSign = /\w+ъ\b/.test(text);
     
     // 3. Проверка на наличие вопросительных конструкций
-    const hasQuestionStructure = /\?|как|почему|зачем|что такое|расскажи|объясни/i.test(text);
+    const hasQuestionStructure = /\?|как|почему|зачем|что такое|расскажи|объясни|кто/i.test(text);
     
     // 4. Проверка длины текста (вопросы обычно короче)
     const isLongEnough = text.length > 50;
@@ -74,6 +74,17 @@ function isPreReformRussianText(text) {
     // - НЕТ вопросительных конструкций
     // - достаточная длина
     return (hasPreReformCharacters || hasTrailingHardSign) && !hasQuestionStructure && isLongEnough;
+}
+
+// 🚀 Экран ввода нового текста
+function showNewTextForm() {
+    document.getElementById('content').innerHTML = 
+        <div class="card">
+            <h3>Новый текст</h3>
+            <textarea id="original-text" placeholder="Введите старорусский текст"></textarea>
+            <button onclick="processText()">Обработать</button>
+            <button onclick="navigateTo('menu')">Назад</button>
+        </div>;
 }
 
 // Обновленная функция отправки текста
